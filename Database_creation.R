@@ -10,6 +10,7 @@ library(DBI)
 library(RMySQL)
 library(RJDBC)
 
+
 #Start the MAMP local server
 
 #First we make the connection to the local SQL server 
@@ -67,14 +68,12 @@ dbGetQuery(conn, "CREATE TABLE Company (
 );")
 
 dbGetQuery(conn, "CREATE TABLE Clinicaltrials (
-  clinicaltrials_ID int NOT NULL AUTO_INCREMENT,
+  clinicaltrials_ID int,
   nct_ID varchar(255),
   disease_ID int,
   drug_ID  int, 
-  company_ID  int,
-  FOREIGN KEY (disease_ID) REFERENCES Disease(disease_ID),
-  FOREIGN KEY (drug_ID) REFERENCES Drug(drug_ID),
-  FOREIGN KEY (company_ID) REFERENCES Company(company_ID)
+  clintrial_name  int,
+  PRIMARY KEY (clinicaltrials_ID)
 );")
 
 
@@ -84,23 +83,28 @@ ticker_dict <- read.csv(file = "/Users/student/Documents/Professional Work/Prama
 Company_df <- data.frame(company_ID = NA, stock_name = ticker_dict$stock_name, clintrial_name = ticker_dict$clintrials_name, ticker = ticker_dict$symbol)
 
 dbWriteTable(conn, "Company", Company_df, append = TRUE, row.names = FALSE)
-dbReadTable(conn, "Company")
 
 
 #Now we add some clinical trials
 
-clintrials_all <- read.csv(file = "/Users/student/Documents/Professional Work/Pramanta/Pramanta/all_trials/all_trials.csv", nrows = 10000)
-clintrials_head <- clintrials_all[,1:50]
-clintrials_head$nct_ID <- str_match(clintrials_all$id_info.nct_id, "<(.*?)>")
-clintrials_head <- str_match_all(clintrials_all, "<(.*?)>")
-
+clintrials_all <- read.csv(file = "/Users/student/Documents/Professional Work/Pramanta/Pramanta/all_trials/all_trials.csv", nrows = 100000)
+clintrials_head <- clintrials_all[1:1000,1:50]
+clintrials_head$nct_ID <- str_match(clintrials_head$id_info.nct_id, "<(.*?)>")
 
 dbWriteTable(conn, "Clinicaltrials_alldata", clintrials_head, append = TRUE, row.names=FALSE )
 
-dbGetQuery(conn, "ALTER TABLE Clinicaltrials ADD INDEX(nct_ID);")
-dbGetQuery(conn, "ALTER TABLE Clinicaltrials_alldata
-ADD FOREIGN KEY (nct_id)
-REFERENCES Clinicaltrials(nct_id);")
 
-colnames(clintrials_head)
+clintrials_index <- subset(clintrials_all, select= c(id_info.nct_id, sponsors.lead_sponsor.agency))
+
+for (i in 1:ncol(clintrials_index)){
+  clintrials_index[,i] <- ifelse((str_count(clintrials_index[,i], "<")>1),clintrials_index[,i],str_sub(clintrials_index[,i], 2, -2) )
+}
+
+colnames(clintrials_index) <- c("nct_ID", "clintrial_name")
+
+dbWriteTable(conn, "Clinicaltrials", clintrials_index, append = TRUE, row.names=FALSE)
+
+
+#company to search - Exelixis
+
 
