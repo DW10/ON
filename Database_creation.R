@@ -101,10 +101,43 @@ for (i in 1:ncol(clintrials_index)){
 }
 
 colnames(clintrials_index) <- c("nct_ID", "clintrial_name")
+clintrials_index <- clintrials_index[90000:100000,]
 
-dbWriteTable(conn, "Clinicaltrials", clintrials_index, append = TRUE, row.names=FALSE)
+dbWriteTable(conn, "Clinicaltrials_index", clintrials_index, append = TRUE, row.names=FALSE)
 
 
 #company to search - Exelixis
 
+dbGetQuery(conn, "SELECT
+           clintrial_name,
+           ticker
+           FROM
+           Company
+           LIMIT 5 ;")
 
+dbGetQuery(conn, "SELECT
+           clintrial_name,
+           ticker FROM
+           Company
+           WHERE
+           clintrial_name = 'Exelixis' ;")
+
+dbGetQuery(conn, "SELECT
+           clintrial_name,
+           nct_ID FROM
+           Clinicaltrials_index
+           WHERE clintrial_name = 'Exelixis'
+           ;")
+
+dbGetQuery(conn, "SELECT clintrial_name, ticker,nct_ID
+          FROM Company JOIN Clinicaltrials_index USING (clintrial_name)
+          LIMIT 10 
+           ;")
+
+dbGetQuery(conn, "SELECT Company.clintrial_name, ticker,nct_ID
+          FROM Company 
+          JOIN Clinicaltrials_index ON Company.clintrial_name = Clinicaltrials_index.clintrial_name
+          LIMIT 10 
+           ;")
+
+dbClearResult(dbListResults(conn)[[1]])
