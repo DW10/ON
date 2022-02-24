@@ -7,7 +7,7 @@ library(quantmod)
 library(TTR)
 
 
-host_ip_adress
+#host_ip_adress
 ip <- "35.197.229.210"
 user <- "dylan_whitaker"
 password <- "dw515"
@@ -28,8 +28,6 @@ if(!("ONA_test" %in% list_of_dbs$Database)){
 
 dbGetQuery(conn, "USE ONA_test;")
 
-dbListTables(conn)
-dbListFields(conn, "Company")
 
 #We now need to create the three master tables 
 
