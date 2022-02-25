@@ -8,12 +8,13 @@ library(RMySQL)
 
 #To access the database you need the IP address from the instance. 
 #The Username and password is genarated from the user setting
-#If you are struggaling to connect then check your IP has been approved
+
 ip <- "35.197.229.210"
 user <- "dylan_whitaker"
 db <- "ONA_test"
 
 #Now we open the connection 
+#If this takes time then fails then check your IP has been approved
 mydrv <- dbDriver("MySQL")
 conn <- dbConnect(mydrv,host=ip, user=user ,password=rstudioapi::askForPassword("Database password"))
 
