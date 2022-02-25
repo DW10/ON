@@ -38,4 +38,4 @@ for(i in 1:length(tables)){
 
 #You can now query the tables above or combinations using SQL syntax
 
-dbGetQuery(conn, "SELECT * FROM Company LIMIT 10;")
+df <- dbGetQuery(conn, "SELECT * FROM Company LIMIT 10;")
