@@ -201,6 +201,34 @@ dbGetQuery(conn, "CREATE TABLE Clinicaltrials (
   PRIMARY KEY (clinicaltrials_ID)
 );")
 
+
+#We will now upload the clinical trial all data table however alot of the coloumn names are over the MySQL col name limit of 64
+#To avoid this but retain the Clinic trial syntax we will use rename the columns to shorted names that can then be backtracked
+
+clin_trial_headings <- data.frame(full_name = colnames(all_trials), short_name = colnames(all_trials))
+
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "clinical_results.", "c_r.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "outcome_list.outcome.", "out.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "baseline.", "base.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "reported_events.", "event.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "measure.class_list.class.", "meas.class.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "category_list.category.", "cat.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "measurement_list.measurement.", "meas.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "participant_flow.period_list.period.", "partipant.flow.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "milestone_list.milestone.participants_list.", "mile.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "event_list.event.", "evnt.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "analyzed_list.analyzed.count_list.", "analyze.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "drop_withdraw_reason_list.drop_withdraw_reason", "withdraw")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "participants_list.participants.", "particip.")
+clin_trial_headings$short_name <- str_replace_all(clin_trial_headings$short_name, "provided_document_section.provided_document.", "document.")
+
+clin_trial_headings[which(nchar(clin_trial_headings$short_name) > 64),2]
+
+colnames(all_trials) <- clin_trial_headings$short_name
+
+dbCreateTable(conn, "Clinicaltrials", fields = all_trials)
+
+
 #To Do: Upload the all trials df in here please
 
 rm(all_trials)
