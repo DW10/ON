@@ -158,9 +158,9 @@ drugs$drug_ID <- as.numeric(NA)
 drugs <- drugs[,c(4,1,3,2)]
 colnames(drugs) <- c("drug_ID", "drug_name", "drug_MESH", "drug_freq_in_trials")
 
-dbWriteTable(conn, "Drugs", drugs, row.names=FALSE)
+dbWriteTable(conn, "Drug", drugs, row.names=FALSE, append=TRUE)
 
-rm(drugs, intervention_MESH_df, intervention_name_df)
+rm(drugs, intervention_MESH_df, intervention_name_df, intervention_MESH_list, intervention_name_list)
 
 dbGetQuery(conn, "CREATE TABLE Disease (
   disease_ID INT AUTO_INCREMENT,
@@ -178,7 +178,7 @@ disease <- disease[,c(4,1,3,2)]
 colnames(disease) <- c("disease_ID", "disease_name", "disease_MESH", "disease_freq_in_trials")
 
 dbWriteTable(conn, "Disease", disease, row.names=FALSE, append=TRUE)
-rm(disease, condition_specific_df, condition_MESHterm_df)
+rm(disease, condition_specific_df, condition_MESHterm_df, condition_specific_list, condition_MESHterm_list)
 
 dbGetQuery(conn, "CREATE TABLE DiseaseEpi (
   disease_ID int,
@@ -198,4 +198,9 @@ dbGetQuery(conn, "CREATE TABLE Clinicaltrials (
   PRIMARY KEY (clinicaltrials_ID)
 );")
 
+#To Do: Upload the all trials df in here please
+
+rm(all_trials)
+
+dbDisconnect(conn)
 
